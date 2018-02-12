@@ -480,12 +480,12 @@ void graph::prim()
 		}
 	}
 
-	//Print the edges of the MST
+	//Print the edges of the MST with their corresponding edge-weights
 	cout << "Edges in the MST are: " << endl;
 	for (int i = 0; i < vertices; i++)
 	{
 		if (v[i].parent != -1)
-			cout << i << "," << v[i].parent << endl;
+			cout << i << "," << v[i].parent << " " << v[i].parentWeight<< endl;
 	}
 }
 
@@ -535,7 +535,7 @@ int main()
 	graph undirectedGraph;
 	undirectedGraph.readGraph(undirectedGraphFile);
 	undirectedGraph.prim();
-	
+
 	//Close the file before closing the program
 	cout << endl;
 	fclose(undirectedGraphFile);
