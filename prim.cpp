@@ -18,7 +18,7 @@ class graph;
 class vertex;
 class minHeap;
 
-//Structure path to store the currently known least distance to a vertex from the given source vertex
+//Structure edge to store the currently known least cost to a vertex from the current cut S
 //minHeap based on this structure
 struct edge
 {
@@ -455,27 +455,32 @@ class graph
 	}
 };
 
+//Function defined to find a minimum spanning tree and print all the edges of the MST
 void graph::prim()
 {
-	minHeap cost = minHeap(vertices);
-	cost.decreaseKey(cost.getIndex(0), 0);
-	while (cost.getSize() > 0)
+	//Initializing all the vertices with cost infinity (INT_MAX)
+	minHeap cost = minHeap(vertices);		//Vertices in the minHeap represent vertices of V/S where S is the set of vertices added with minimum cost forming a cut
+	cost.decreaseKey(cost.getIndex(0), 0);	//Setting the cost of the source vertex (0th vertex) to be 0
+	while (cost.getSize() > 0)					//if all the vertices are added, MST is complete
 	{
-		edge u = cost.removeMin();
-		v[u.edgeTo].visited = true;
+		edge u = cost.removeMin();				//Taking the safe edge across the cut
+		v[u.edgeTo].visited = true;			//Marking it as visited
 		node *p = v[u.edgeTo].list.head;
-		while (p != NULL)
+		while (p != NULL)							//Checking for its neighbors
 		{
+			//If the neighbor is not visited and the cost is more than it's edge weight from the newly added vertex in S
+			//Update the cost, parent and parent weight
 			if (!v[p->edgeTo].visited && cost.getValue(cost.getIndex(p->edgeTo)).key > p->weight)
 			{
 				cost.decreaseKey(cost.getIndex(p->edgeTo), p->weight);
 				v[p->edgeTo].parent = u.edgeTo;
 				v[p->edgeTo].parentWeight = p->weight;
 			}
-			p = p->next;
+			p = p->next;	//Check for next neighbor
 		}
 	}
 
+	//Print the edges of the MST
 	cout << "Edges in the MST are: " << endl;
 	for (int i = 0; i < vertices; i++)
 	{
@@ -529,8 +534,8 @@ int main()
 	//Read the graph and print the paths
 	graph undirectedGraph;
 	undirectedGraph.readGraph(undirectedGraphFile);
-	//undirectedGraph.dijkstra();
 	undirectedGraph.prim();
+	
 	//Close the file before closing the program
 	cout << endl;
 	fclose(undirectedGraphFile);
