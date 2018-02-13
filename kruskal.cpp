@@ -108,12 +108,38 @@ class graph
 	private:
 		int vertices, edges;
 		edge *e;
-		minHeap sortedEdges;
 	public:
 		graph();
+		void kruskal();
 }
 
-void graph::graph()
+void graph::kruskal()
+{
+	minHeap sortedEdges;
+	sortedEdges.buildHeap(edges, e);
+	edge MST[vertices-1];
+	int mstSize = 0;
+
+	unionFind set(vertices);
+
+	while (i < vertices - 1)
+	{
+		edge f = sortedEdges.removeMin();
+		
+		if(set.find[f.u] != set.find[f.v])
+		{
+			set.setUnion(f.u, f.v);
+			MST[i] = f;
+			i++;
+		}
+	}
+
+	cout<<"Edges in the MST are: "<<endl;
+	for(i = 0; i < vertices - 1; i++)
+		cout<<MST[i].u<<","<<MST[i].v<<" "<<MST[i].weight<<endl;
+}
+
+graph::graph()
 {
 	cin>>vertices;
 	cin>>edges;
@@ -137,6 +163,12 @@ class minHeap
 		{
 			size = 0;
 			list = NULL;
+		}
+
+		~minHeap()
+		{
+			if(list != NULL)
+				delete[] list;
 		}
 
 		int left(int index)
