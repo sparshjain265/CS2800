@@ -9,9 +9,12 @@
 #include<iostream>
 using namespace std;
 
+//Declaring classes so they can be declared friendly later
 class unionFind;
 class minHeap;
 
+//Class node for each vertex to implement the unionFind
+//Each node contains it's rank, it's index(for referencing), and it's parent
 class node
 {
 	private:
@@ -19,6 +22,7 @@ class node
 		int index;
 		int parent;
 	public:
+		//Constructor to initialize with rank 0 and parent as itself
 		node()
 		{
 			rank = 0;
@@ -26,21 +30,25 @@ class node
 			parent = index;
 		}
 
-		friend class unionFind;
+		friend class unionFind;	//declaring unionFind class as friendly so that it can access members easily
 };
 
+//Class unionFind to implement unionFind data structure using trees, rank and path compression
+//Contains the total number of elements and a dynamic array of vertices
 class unionFind
 {
 	private:
 		int size;
 		node *vertex;
 	public:
+		//Default Constructor to initialize an empty set
 		unionFind()
 		{
 			size = 0;
 			vertex = NULL;
 		}
 
+		//Overloaded constructor to call a specified makeSet operations
 		unionFind(int n)
 		{
 			size = n;
@@ -49,6 +57,8 @@ class unionFind
 				makeSet(i);
 		}
 
+		//makeSet Function to insitialize each vertex as a separate set by setting it's parent to itself, it's rank to be 0
+		//Also sets the vertex's index to be it's index in the array for easy referencing
 		void makeSet(int index)
 		{
 			vertex[index].parent = index;
