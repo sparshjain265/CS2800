@@ -7,8 +7,10 @@
 */
 
 #include<iostream>
+using namespace std;
 
 class unionFind;
+class minHeap;
 
 class node
 {
@@ -43,7 +45,7 @@ class unionFind
 		{
 			size = n;
 			vertex = new node[n];
-			for(i = 0; i < n; i++)
+			for(int i = 0; i < n; i++)
 				makeSet(i);
 		}
 
@@ -101,56 +103,8 @@ class edge
 			return weight;
 		}
 	friend class graph;
-}
-
-class graph
-{
-	private:
-		int vertices, edges;
-		edge *e;
-	public:
-		graph();
-		void kruskal();
-}
-
-void graph::kruskal()
-{
-	minHeap sortedEdges;
-	sortedEdges.buildHeap(edges, e);
-	edge MST[vertices-1];
-	int mstSize = 0;
-
-	unionFind set(vertices);
-
-	while (i < vertices - 1)
-	{
-		edge f = sortedEdges.removeMin();
-		
-		if(set.find[f.u] != set.find[f.v])
-		{
-			set.setUnion(f.u, f.v);
-			MST[i] = f;
-			i++;
-		}
-	}
-
-	cout<<"Edges in the MST are: "<<endl;
-	for(i = 0; i < vertices - 1; i++)
-		cout<<MST[i].u<<","<<MST[i].v<<" "<<MST[i].weight<<endl;
-}
-
-graph::graph()
-{
-	cin>>vertices;
-	cin>>edges;
-	e = new edge[edges];
-	for(int i = 0; i < edges; i++)
-	{
-		cin>>e[i].u;
-		cin>>e[i].v;
-		cin>>e[i].weight;
-	}
-}
+	friend class minHeap;
+};
 
 class minHeap
 {
@@ -188,7 +142,7 @@ class minHeap
 		void buildHeap(int edges, edge e[]);
 		void minHeapify(int index);
 		edge removeMin();
-}
+};
 
 void minHeap::buildHeap(int edges, edge e[])
 {
@@ -244,4 +198,73 @@ edge minHeap::removeMin()
 		minHeapify(1);
 	
 	return result;
+}
+
+class graph
+{
+	private:
+		int vertices, edges;
+		edge *e;
+	public:
+		~graph()
+		{
+			if(e != NULL)
+				delete[] e;
+		}
+
+		graph();
+		void kruskal();
+};
+
+void graph::kruskal()
+{
+	minHeap sortedEdges;
+	sortedEdges.buildHeap(edges, e);
+	edge MST[vertices-1];
+	int mstSize = 0;
+
+	unionFind set(vertices);
+
+	while (mstSize < vertices - 1)
+	{
+		edge f = sortedEdges.removeMin();
+		
+		if(set.find(f.u) != set.find(f.v))
+		{
+			set.setUnion(f.u, f.v);
+			MST[mstSize] = f;
+			mstSize++;
+		}
+	}
+
+	int totalWeight = 0;
+	cout<<"Edges in the MST are: "<<endl;
+	for(int i = 0; i < mstSize; i++)
+	{
+		cout<<MST[i].u<<","<<MST[i].v<<" "<<MST[i].weight<<endl;
+		totalWeight += MST[i].weight;
+	}
+	cout<<"Total Weight of the MST: "<<totalWeight<<endl;
+}
+
+graph::graph()
+{
+	cin>>vertices;
+	cin>>edges;
+	e = new edge[edges];
+	for(int i = 0; i < edges; i++)
+	{
+		cin>>e[i].u;
+		cin>>e[i].v;
+		cin>>e[i].weight;
+	}
+}
+
+int main()
+{
+	graph g;
+	g.kruskal();
+
+	cout<<endl;
+	return 0;
 }
