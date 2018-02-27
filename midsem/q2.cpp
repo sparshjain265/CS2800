@@ -6,6 +6,7 @@
 	Date			: February 27, 2018
 */
 
+//Include required libraries
 #include<iostream>
 #include<limits.h>
 using namespace std;
@@ -25,7 +26,7 @@ struct path
 
 /*
    This implementation uses a dynamic array to store the heap of size n from index 1 to n instead of the usual array implementation of 1 to n-1
-   class minHeap to implement minHeap with necessary functions
+   class minHeap to implement minHeap with only necessary functions
 */
 class minHeap
 {
@@ -35,7 +36,7 @@ class minHeap
 	int *indices; //Stores the index of ith vertex;
 
  public:
-	//Constructor to initialize the size to be 0
+	//Default constructor to initialize the size to be 0
 	minHeap()
 	{
 		size = 0;
@@ -233,6 +234,7 @@ int minHeap::decreaseKey(int index, int newKey)
 }
 
 //Structure node defined to implement a linked list on
+//Stores information of an edge
 struct node
 {
 	int edgeTo; //Stores the vertex to which an edge exists
@@ -241,6 +243,7 @@ struct node
 };
 
 //Class link defined to implement a linked list with only required functions
+//Used to store adjacency list of a vertex
 class link
 {
  private:
@@ -299,12 +302,12 @@ void link::addTail(int edgeTo, int weight)
 class vertex
 {
  private:
-	link list;									//A linked list containing it's neighbors and their edge-weights
+	link list;									//A linked (adjacency) list containing it's neighbors and their edge-weights
 	bool visited;								//A flag to mark whether the vertex is visited or not
 	int parent, parentWeight, distance; //Variables to store the parent in a path, weight of the edge to the parent and distance from the source vertex
 
  public:
-	//Constructor to initialize distance as infinity, parent as none, and visited as false
+	//Default constructor to initialize distance as infinity, parent as none, and visited as false
 	vertex()
 	{
 		visited = false;
@@ -325,13 +328,13 @@ class vertex
 class graph
 {
  private:
-	vertex *v;							 //Dynamic array of vertices
-	int vertices, edges;				 //Variables to store the number of vertices, edges, and the source vertex
+	vertex *v;							 					//Dynamic array of vertices
+	int vertices, edges;				 					//Variables to store the number of vertices, edges, and the source vertex
 
  public:
-	void readGraph(); //Function to read a graph
-	void dijkstra(int source, int destination);					 //Function to call the dijkstra algorithm and find the minimum distance paths from the source vertex
-	void drive();						 //Function to give a shortest route to the driver according to the requirements
+	void readGraph(); 									//Function to read a graph
+	void dijkstra(int source, int destination);	//Function to call the dijkstra algorithm and find the minimum distance paths from the source vertex
+	void drive();						 					//Function to give a shortest route to the driver according to the requirements
 
 	//Destructor to free the memory allocated for vertices
 	~graph()
@@ -401,6 +404,9 @@ void graph::drive()
 
 
 //Function Definition of the dijkstra's algorithm
+//Takes source and destination vertices as input
+//Prints the shortest path from the source to destination
+//Automatically disregards any negative edge
 void graph::dijkstra(int source, int destination)
 {
 	//Heap created to store the distance, initialized with size equal to the number of vertices and all distance = inf
@@ -444,8 +450,8 @@ void graph::dijkstra(int source, int destination)
 		return;
 	}
 	
-	cout<<"Minimum Path is ";
 	//Print the path if exists
+	cout<<"Minimum Path is ";
 	path[i] = destination;
 	i++;
 	while(v[current].parent != -1)
