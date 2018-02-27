@@ -379,6 +379,10 @@ void graph::drive()
 		cin >> destination;
 
 		//Calling dijkstra to find the appropriate path for the driver
+		cout<<endl;
+		cout<<"Round "<<i + 1<<endl;
+		cout<<"Source: "<<source<<endl;
+		cout<<"Destination: "<<destination<<endl;
 		dijkstra(source, destination);
 
 		//Unmark the roads for next round
@@ -440,7 +444,6 @@ void graph::dijkstra(int source, int destination)
 	}
 
 	//Display the shortest path to destination vertex from the source vertex
-	//cout << "Shortest path from " << source << "to each vertex:" << endl;
 	int i = 0, path[vertices];
 	int current = destination;
 	//If no path found, parent of destination would be -1
