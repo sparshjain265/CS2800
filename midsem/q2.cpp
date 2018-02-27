@@ -24,9 +24,8 @@ struct path
 };
 
 /*
-   This implementation uses an array to store the heap of size n from index 1 to n instead of the usual array implementation of 1 to n-1
+   This implementation uses a dynamic array to store the heap of size n from index 1 to n instead of the usual array implementation of 1 to n-1
    class minHeap to implement minHeap with necessary functions
-   The maximum size of the heap can be 9999
 */
 class minHeap
 {
@@ -109,35 +108,10 @@ class minHeap
 			return index / 2;
 	}
 
-	//Returns the minimum element from the heap
-	path getMin()
-	{
-		if (size == 0)
-		{
-			cout << "Heap Empty!" << endl;
-			return list[0];
-		}
-		return list[1];
-	}
-
-	//Destroys the heap
-	void destroy()
-	{
-		size = 0;
-		cout << "Destroyed entire heap!" << endl;
-	}
-
 	minHeap(int n);								 //Overloaded constructor to build a heap of a given size with all keys as INT_MAX
-	minHeap(path array[], int n);				 //Overloaded constructor to build a heap from an array of definite size
 	int minHeapify(int index);					 //Function minHeapify to correct any distortion between the given index and its decendents
-	void build(path array[], int n);			 //Function build to create a heap from a given array of definite size
 	int siftUp(int index);						 //Function siftUp to correct any distortion between the given index and its ancestors
-	int siftUp(int index, int *indices);	 //Function siftUp overloaded to update the index of each vertex;
-	void insert(path data);						 //Function insert to insert a new element in the heap
 	path removeMin();								 //Function removeMin to remove the minimum element from the heap
-	void heapSort();								 //Function heapSort to sort the given heap
-	void showTree(int node, int offset);	 //Function to display the heap in a tree like format
-	void printHeap();								 //Function to display the heap as an array
 	int decreaseKey(int index, int newKey); //Function to decease the key at an index
 };
 
@@ -153,15 +127,6 @@ minHeap::minHeap(int n)
 		list[i + 1].key = INT_MAX;
 		indices[i] = i + 1;
 	}
-}
-
-//Constructor to build a heap with a given array of a definite size
-minHeap::minHeap(path array[], int n)
-{
-	size = n;
-	list = new path[size + 1];
-	indices = new int[size + 1];
-	build(array, n);
 }
 
 //minHeapify corrects any distortion between the given index and its decendents, returns the final index
@@ -197,35 +162,6 @@ int minHeap::minHeapify(int index)
 		return index;
 }
 
-//build creates the heap of a given size from a given array by calling minHeapify for all nodes with height more than 0 in ascending order of their heights
-void minHeap::build(path array[], int n)
-{
-	if(size != n)
-	{
-		if(list != NULL)
-			delete[] list;
-		if(indices != NULL)
-			delete[] indices;
-		size = n;
-		list = new path[size + 1];
-		indices = new int[size + 1];
-	}
-	
-	int i;
-	size = 0;
-
-	//copy the array
-	for (i = 0; i < n; i++)
-	{
-		size++;
-		list[size] = array[i];
-	}
-
-	//call minHeapify as required
-	for (i = size / 2; i > 0; i--)
-		minHeapify(i);
-}
-
 //siftUp corrects any distortion between the given index and its ancenstors, returns the final index
 int minHeap::siftUp(int index)
 {
@@ -250,24 +186,6 @@ int minHeap::siftUp(int index)
 	}
 	else //else return the same index
 		return index;
-}
-
-//insert a new element in the heap
-void minHeap::insert(path data)
-{
-	//check for boundary condition
-	if (size == 9999)
-	{
-		cout << "Heap already Full!" << endl;
-		return;
-	}
-
-	//update the size and enter data in the end
-	size++;
-	list[size] = data;
-
-	//arrange the heap by sifting Up the data
-	siftUp(size);
 }
 
 //remove and return the minimum element from the heap
@@ -296,58 +214,6 @@ path minHeap::removeMin()
 		minHeapify(1);
 	//return the minimum element
 	return result;
-}
-
-//display the heap in ascending order
-void minHeap::heapSort()
-{
-	int n = size;
-	path array[10000];
-
-	//Use removeMin repeatedly to get ascending order
-	for (int i = 1; i <= n; i++)
-	{
-		path num = removeMin();
-		cout << "vertex: " << num.pathTo << ", distance: " << num.key << " ";
-		array[i - 1] = num;
-	}
-	cout << endl;
-	//rebuild the heap to retain the data
-	build(array, n);
-}
-
-//print the heap in a tree like format from a given node
-void minHeap::showTree(int node, int offset)
-{
-	//Check for boundary conditions
-	if (size == 0)
-	{
-		cout << "Empty Heap! Nothing to display!" << endl;
-		return;
-	}
-
-	//display the right branch of the tree from the node (if exists)
-	int child = right(node);
-	if (child != -1)
-		showTree(child, offset + 1);
-
-	//display the current node at appropriate spacing
-	for (int i = 0; i < offset; i++)
-		cout << "\t";
-	cout << list[node].pathTo << "," << list[node].key << endl;
-
-	//display the left branch of the tree from the node (if exists)
-	child = left(node);
-	if (child != -1)
-		showTree(child, offset + 1);
-}
-
-//print the heap in the array format
-void minHeap::printHeap()
-{
-	for (int i = 0; i < size; i++)
-		cout << list[i + 1].pathTo << "," << list[i].key << " ";
-	cout << endl;
 }
 
 //decrease the key of a given index to new key, and return it's new index
@@ -464,7 +330,6 @@ class graph
 
  public:
 	void readGraph(); //Function to read a graph
-	void printGraph();				 //Function to print the graph on screen just like the text file
 	void dijkstra(int source, int destination);					 //Function to call the dijkstra algorithm and find the minimum distance paths from the source vertex
 	void drive();						 //Function to give a shortest route to the driver according to the requirements
 
@@ -598,23 +463,6 @@ void graph::dijkstra(int source, int destination)
 	}
 	cout<<endl;
 	cout<<"Minimum Path Distance is "<<v[destination].distance<<endl;
-}
-
-//Function defined to print the graph on screen as it is from the file
-void graph::printGraph()
-{
-	cout << vertices << endl;
-	cout << edges << endl;
-	for (int i = 0; i < vertices; i++)
-	{
-		node *p = v[i].list.head;
-		while (p != NULL)
-		{
-			if (i < p->edgeTo)
-				cout << i << " " << p->edgeTo << " " << p->weight << endl;
-			p = p->next;
-		}
-	}
 }
 
 //Function defined to read the graph from the file
