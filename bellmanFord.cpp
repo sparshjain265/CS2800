@@ -35,7 +35,7 @@ class vertex
 	vertex()
 	{
 		parent = -1;
-		parentWeight = distance = INT_MAX;
+		parentWeight = distance = INT_MAX / 2;
 	}
 
 	//Declaring graph as a friendly function for easy access of private members
@@ -82,7 +82,8 @@ void graph::bellmanFord()
 	{
 		bool flag = false;
 		for (int j = 0; j < edges; j++)
-			flag = relax(e[j]) || flag;
+			if (relax(e[j]))
+				flag = true;
 
 		//If no update was made in this round, none will be made in further rounds
 		if (!flag)
