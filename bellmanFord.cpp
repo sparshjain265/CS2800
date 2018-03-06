@@ -35,7 +35,7 @@ class vertex
 	vertex()
 	{
 		parent = -1;
-		parentWeight = distance = INT_MAX / 2;
+		parentWeight = distance = INT_MAX;
 	}
 
 	//Declaring graph as a friendly function for easy access of private members
@@ -91,66 +91,44 @@ void graph::bellmanFord()
 	}
 
 	//check for negative weighted cycle
-	//If one more round updates the distance of a vertex, a negative weighted cycle is present
-	//i will store the number of updated vertices
-	//possibleCycles will store the vertices updated
-	int possibleCycles[vertices], i = 0;
+	//If a distance to the vertex is updated by some relax operation, it means a negative weighted cycle is present
+	int updatedVertex = -1;
 	for (int j = 0; j < edges; j++)
 	{
-		bool flag = relax(e[j]);
-		if (flag == true)
-		{
-			possibleCycles[i] = e[j].u;
-			i++;
-		}
+		if (relax(e[j]))
+			updatedVertex = e[j].v;
 	}
 
-	//If found, print the cycle
-	if (i > 0)
+	//If the updated vertex is not -1, a negative weighted cycle was encountered
+	if (updatedVertex != -1)
 	{
-		int cycle[vertices];
-		int cycleWeights[vertices];
-		bool found = false;
-		int j = 0;
-		//find the vertex included in the cycle from the possibilities
-		//store the cycle and weights of corresponding edges
-		while (!found)
+		//keep a track of visited vertices
+		bool visited[vertices];
+		for (int i = 0; i < vertices; i++)
+			visited[i] = false;
+		//Go up via parent, if a vertex is visited again, we've found a cycle
+		while (!visited[updatedVertex])
 		{
-			j = 0;
-			i--;
-			int current = possibleCycles[i];
-			cycle[j] = current;
-			cycleWeights[j] = v[current].parentWeight;
-			j++;
-			cycle[j] = -1;
-			current = v[current].parent;
-			//keep going upward through the parent until cycle is formed, or it is estabilished that the considered vertex is not a part of the negative weighted cycle
-			while (current != possibleCycles[i] && current != -1 && j < vertices)
-			{
-				cycle[j] = current;
-				cycleWeights[j] = v[current].parentWeight;
-				j++;
-				cycle[j] = -1;
-				current = v[current].parent;
-			}
-			//if cycle is found, mark found
-			if (current == possibleCycles[i])
-				found = true;
-			if (i == 0)
-				break;
+			visited[updatedVertex] = true;
+			updatedVertex = v[updatedVertex].parent;
 		}
-		//Initial weight of the cycle is set to 0
-		int weight = 0;
-		//Print the cycle while updating the weight of the cycle
-		cout << "The negative weighted cycle is: " << cycle[0];
+		int cycle[vertices], current = v[updatedVertex].parent, j = 1, weight = 0;
+		cycle[0] = updatedVertex;
+		weight += v[updatedVertex].parentWeight;
+		while (current != updatedVertex)
+		{
+			cycle[j] = current;
+			j++;
+			weight += v[current].parentWeight;
+			current = v[current].parent;
+		}
+		cout << "The negative weighted cycle is: " << updatedVertex;
 		while (j > 0)
 		{
 			j--;
 			cout << "--->" << cycle[j];
-			weight += cycleWeights[j];
 		}
 		cout << endl;
-		//Print the weight of the cycle
 		cout << "Weight of the cycle is " << weight << endl;
 	}
 	//else print the shortest path from the source vertex to all the vertices
@@ -159,29 +137,34 @@ void graph::bellmanFord()
 		for (int i = 0; i < vertices; i++)
 		{
 			cout << endl;
-			int current = i, weight = 0, path[vertices], j = 0;
-			cout << "Shortest path from " << source << " to " << i << " : ";
-			//Go up via parent and store the ancestors in the path array till you reach the source vertex
-			//Update the weight of the path simultaneously
-			while (current != source)
+			if (v[i].distance != INT_MAX)
 			{
+				int current = i, path[vertices], j = 0;
+				cout << "Shortest path from " << source << " to " << i << " : ";
+				//Go up via parent and store the ancestors in the path array till you reach the source vertex
+				//Update the weight of the path simultaneously
+				while (current != source && current != -1)
+				{
+					path[j] = current;
+					j++;
+					current = v[current].parent;
+				}
 				path[j] = current;
 				j++;
-				weight += v[current].parentWeight;
-				current = v[current].parent;
+
+				// print the path array downwards to show the path from source to the vertex
+				while (j > 1)
+				{
+					j--;
+					cout << path[j] << "--->";
+				}
+				cout << path[0];
+				cout << endl;
+				//Print the weight of the path
+				cout << "Weight: " << v[i].distance << endl;
 			}
-			path[j] = current;
-			j++;
-			//print the path array downwards to show the path from source to the vertex
-			while (j > 1)
-			{
-				j--;
-				cout << path[j] << "--->";
-			}
-			cout << path[0];
-			cout << endl;
-			//Print the weight of the path
-			cout << "Weight: " << weight << endl;
+			else
+				cout << i << " is not reachable from " << source << endl;
 		}
 	}
 }
@@ -191,7 +174,7 @@ void graph::bellmanFord()
 //Returns true if including the edge reduced the distance of destination vertex, else returns false
 bool graph::relax(edge e)
 {
-	if (v[e.u].distance + e.weight < v[e.v].distance)
+	if (v[e.u].distance != INT_MAX && v[e.u].distance + e.weight < v[e.v].distance)
 	{
 		v[e.v].distance = v[e.u].distance + e.weight;
 		v[e.v].parent = e.u;
