@@ -9,9 +9,11 @@
 #include <iostream>
 using namespace std;
 
+//Declaring class queue to be referred later
 template <typename T>
 class queue;
 
+//class qNode to be used as node for queue
 template <typename T>
 class qNode
 {
@@ -31,9 +33,11 @@ class qNode
 		next = NULL;
 	}
 
+	//declaring friend class for easy access
 	friend class queue<T>;
 };
 
+//Defining class queue for FIFO operations
 template <typename T>
 class queue
 {
@@ -43,6 +47,7 @@ class queue
 	qNode<T> *end;
 
  public:
+	//Constructor to initialize pointers and set size 0
 	queue()
 	{
 		size = 0;
@@ -50,6 +55,7 @@ class queue
 		end = NULL;
 	}
 
+	//Function to enqueue a key
 	void enqueue(T key)
 	{
 		qNode<T> *p = new qNode<T>(key);
@@ -67,6 +73,7 @@ class queue
 		}
 	}
 
+	//Function to dequeue a key
 	T dequeue()
 	{
 		if (!isEmpty())
@@ -87,6 +94,7 @@ class queue
 		}
 	}
 
+	//Function to check whether queue is empty
 	bool isEmpty()
 	{
 		if (size == 0)
@@ -95,6 +103,7 @@ class queue
 			return false;
 	}
 
+	//Function to get the size of the queue
 	int getSize()
 	{
 		return size;
@@ -116,6 +125,7 @@ class BNode
 	BNode **child;
 
  public:
+	//Constructor to create a new node of a given degree parameter
 	BNode(int t)
 	{
 		key = new T[2 * t - 1];
@@ -124,15 +134,18 @@ class BNode
 		isLeaf = false;
 	}
 
+	//Destructor to delete dynamically allocated memory
 	~BNode()
 	{
 		delete[] key;
 		delete[] child;
 	}
 
+	//Declaring BTree as friendly class for easy access
 	friend class BTree<T>;
 };
 
+//Class search result for BTree to store pointer to the node and index of the key
 template <typename T>
 class searchResult
 {
@@ -141,12 +154,14 @@ class searchResult
 	int i;
 
  public:
+	//Constructor to initialize with default not found result
 	searchResult()
 	{
 		node = NULL;
 		i = -1;
 	}
 
+	//Declaring BTree as freind class for easy access
 	friend class BTree<T>;
 };
 
@@ -159,6 +174,7 @@ class BTree
 	BNode<T> *root;
 
  public:
+	//Constructor takes degree parameter as input and creates an empty tree
 	BTree(int deg)
 	{
 		t = deg;
@@ -166,6 +182,7 @@ class BTree
 		root->isLeaf = true;
 	}
 
+	//default search algorithm in BTree implementing binary search within array going downwards
 	searchResult<T> search(BNode<T> *r, T key)
 	{
 		int i = 0, start = 0, end = r->n - 1;
@@ -201,6 +218,7 @@ class BTree
 			return search(r->child[start], key);
 	}
 
+	//search algorithm which enqueues the path taken in a queue
 	searchResult<T> search(BNode<T> *r, T key, queue<int> *q)
 	{
 		int start = 0, end = r->n - 1;
@@ -247,6 +265,7 @@ class BTree
 		}
 	}
 
+	//search function which calls the search algorithm with queue and prints the path
 	void search(T key)
 	{
 		queue<int> *q = new queue<int>;
@@ -265,6 +284,7 @@ class BTree
 			cout << "key " << key << " is not found." << endl;
 	}
 
+	//Function split to split the ith child of a given node x (assuming x is non-full)
 	void split(BNode<T> *x, int i)
 	{
 		BNode<T> *z = new BNode<T>(t);
@@ -292,7 +312,7 @@ class BTree
 		x->n++;
 	}
 
-	//assume x is not full
+	//insert a key k in the subtree rooted at x assuming x is not full
 	void insert(BNode<T> *x, T k)
 	{
 		int i;
@@ -320,8 +340,10 @@ class BTree
 		}
 	}
 
+	//insert a key k in the BTree, root may or may not be full
 	void insert(T k)
 	{
+		//If root is full, split and create a new root, then call insert in non-full subtree else call insert directly
 		if (root->n == 2 * t - 1)
 		{
 			BNode<T> *r = new BNode<T>(t);
@@ -334,6 +356,7 @@ class BTree
 			insert(root, k);
 	}
 
+	//Print a sub-BTree rotated 90deg anti-clockwise i.e left to right on screen after a given offset
 	void print(BNode<T> *r, int offset)
 	{
 		if (r == NULL)
@@ -354,6 +377,7 @@ class BTree
 			print(r->child[0], offset + 1);
 	}
 
+	//Print the whole BTree, with no offset for root
 	void print()
 	{
 		print(root, 0);
@@ -362,13 +386,18 @@ class BTree
 
 int main()
 {
+	//BTree with degree parameter 3
 	BTree<int> tree(3);
 
+	//Input for number of insertions
+	cout << "Enter the number of insertions: ";
 	int n;
 	cin >> n;
 
+	//n insertions with printing current state of BTree after each insert
 	for (int i = 0; i < n; i++)
 	{
+		cout << "Enter element #" << i + 1 << ": ";
 		int k;
 		cin >> k;
 		cout << endl;
@@ -377,10 +406,13 @@ int main()
 		cout << endl;
 	}
 
+	//search in tree untill -1
+	cout << "Enter element to search (-1 to exit): ";
 	cin >> n;
 	while (n >= 0)
 	{
 		tree.search(n);
+		cout << "Enter next element to search (-1 to exit): ";
 		cin >> n;
 	}
 
