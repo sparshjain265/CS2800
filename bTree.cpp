@@ -9,6 +9,7 @@
 #include <iostream>
 using namespace std;
 
+//Function declaration to print the menu
 void printMenu();
 
 //Declaring class queue to be referred later
@@ -358,6 +359,7 @@ class BTree
 			insert(root, k);
 	}
 
+	//rotate the elements in the children about ith element of the given node
 	void rotate(BNode<T> *p, int i)
 	{
 		BNode<T> *x;
@@ -398,6 +400,7 @@ class BTree
 		}
 	}
 
+	//Merge the children on either side of ith element of a given node
 	void merge(BNode<T> *p, int i)
 	{
 		BNode<T> *x = p->child[i];
@@ -424,10 +427,11 @@ class BTree
 		if (p->n == 0)
 		{
 			root = x;
-			delete p;
+			//delete p;
 		}
 	}
 
+	//Delete the minimum element in the subtree rooted at a given node
 	T deleteMin(BNode<T> *r)
 	{
 		if (r->isLeaf)
@@ -451,6 +455,7 @@ class BTree
 			return deleteMin(r->child[0]);
 	}
 
+	//Delete the maximum element in the subtree rooted at the given node
 	T deleteMax(BNode<T> *r)
 	{
 		if (r->isLeaf)
@@ -471,6 +476,8 @@ class BTree
 			return deleteMax(r->child[r->n]);
 	}
 
+	//Delete a given key 'k' in the subtree rooted at the given node
+	//Returns true if deleted, false if not found
 	bool deleteKey(BNode<T> *x, T k)
 	{
 		int start = 0, end = x->n - 1;
@@ -527,7 +534,7 @@ class BTree
 			{
 				if (x->child[start]->n > t - 1)
 					rotate(x, start);
-				else if (start + 1 < 2 * t - 1 && x->child[start + 2]->n > t - 1)
+				else if (start + 1 < x->n && x->child[start + 2]->n > t - 1)
 					rotate(x, start + 1);
 				else
 				{
@@ -553,6 +560,7 @@ class BTree
 		}
 	}
 
+	//Deletes the given key from the tree if found
 	void deleteKey(T key)
 	{
 		if (deleteKey(root, key))
@@ -611,6 +619,7 @@ int main()
 		cout << endl;
 	}
 
+	//Menu based implementation to let the user insert, delete, search or exit
 	int choice;
 	do
 	{
