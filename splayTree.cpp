@@ -345,9 +345,9 @@ class SplayTree
 			}
 			else
 			{
-				r->parent->right = r->right;
-				if(r->right != NULL)
-					r->right->parent = r->parent;
+				r->parent->right = r->left;
+				if(r->left != NULL)
+					r->left->parent = r->parent;
 			}
 			splay(r->parent);
 			delete r;
