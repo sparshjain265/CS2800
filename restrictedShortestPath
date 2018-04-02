@@ -1,0 +1,26 @@
+restricted shortest path(W, k)
+{
+	D1 = W;
+	
+	for i = 2 to k
+		Di = extend(Di-1, W)
+	
+	return Dk
+}
+
+extend(D, W)
+{
+	create new D' = D
+	for i = 1 to n
+		for j = 1 to n 
+			for k = 1 to n
+				if D'ij > Dik + Wkj
+					Dij = Dik + Wkj
+	return D'
+}
+
+O(k*n3)
+
+store D1, D2, ..., D2[logk]
+compute using binary notation of k
+O(logk*n3)

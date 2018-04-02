@@ -1,0 +1,19 @@
+for every pair (Vi, Vj)
+	if i != j
+		Dij = inf
+		Pij = NULL
+	else 
+		Dij = 0
+		Pij = i
+for every edge e = (Vi, Vj) in E 
+	Dij = Wij
+	Pij = i
+
+for k = 1 to n
+	for i = 1 to n
+		for j = 1 to n
+			if Dij > Dik + Dkj
+				Dij = Dik + Dkj
+				Pij = Pkj
+
+O(n3) works only for non negative edges

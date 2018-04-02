@@ -1,0 +1,24 @@
+T = NULL
+while(|T| < n-1)
+{
+	find connected components of T
+	for each component, set min_wt = inf
+	for all edges e = (u, v) of G
+		do{
+			if cc[u] != cc[v]
+				if wt(u, v) < min_wt(cc[u])
+					min_wt(cc[u]) = wt(u, v)
+					minEdge(cc[u]) = e
+				if wt(u, v) < min_wt(cc[v])
+					min_wt(cc[v]) = wt(u, v)
+					minEdge(cc[v]) = e
+		}
+	for each component, add minEdge to T
+}	O(mlogn)
+
+/*
+	A more efficient algorithm:
+	Run Boruvka's for loglogn rounds
+	Prim's Algo with fibonacci heap with one node per connected component
+	final complexity = O(mloglogn)
+*/
