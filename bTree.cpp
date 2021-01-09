@@ -1,16 +1,13 @@
 /*
-	Program		: bTree.cpp
+	Program		: btree.cpp
 	Programmer	: Sparsh Jain
 	Roll No		: 111601026
-	Description	: Implement B-Tree Data Structure
-	Date			: March 20, 2018
+	Description	: Implement insertion and search in B-Tree Data Structure
+	Date			: March 13, 2018
 */
 
 #include <iostream>
 using namespace std;
-
-//Function declaration to print the menu
-void printMenu();
 
 //Declaring class queue to be referred later
 template <typename T>
@@ -359,216 +356,6 @@ class BTree
 			insert(root, k);
 	}
 
-	//rotate the elements in the children about ith element of the given node
-	void rotate(BNode<T> *p, int i)
-	{
-		BNode<T> *x;
-		BNode<T> *s;
-		if (p->child[i]->n == t - 1)
-		{
-			x = p->child[i];
-			s = p->child[i + 1];
-
-			x->key[x->n] = p->key[i];
-			x->child[x->n + 1] = s->child[0];
-			x->n++;
-			p->key[i] = s->key[0];
-			for (int i = 0; i < s->n - 1; i++)
-			{
-				s->child[i] = s->child[i + 1];
-				s->key[i] = s->key[i + 1];
-			}
-			s->child[s->n - 1] = s->child[s->n];
-			s->n--;
-		}
-		else
-		{
-			x = p->child[i + 1];
-			s = p->child[i];
-
-			x->child[x->n + 1] = x->child[x->n];
-			for (int i = x->n; i > 0; i--)
-			{
-				x->key[i] = x->key[i - 1];
-				x->child[i] = x->child[i - 1];
-			}
-			x->n++;
-			x->key[0] = p->key[i];
-			x->child[0] = s->child[s->n];
-			p->key[i] = s->key[s->n - 1];
-			s->n--;
-		}
-	}
-
-	//Merge the children on either side of ith element of a given node
-	void merge(BNode<T> *p, int i)
-	{
-		BNode<T> *x = p->child[i];
-		BNode<T> *y = p->child[i + 1];
-
-		x->key[t - 1] = p->key[i];
-		for (int j = t; j < 2 * t - 1; j++)
-		{
-			x->child[j] = y->child[j - t];
-			x->key[j] = y->key[j - t];
-		}
-		x->child[2 * t - 1] = y->child[t - 1];
-		x->n = 2 * t - 1;
-
-		delete y;
-
-		for (int j = i; j < p->n - 1; j++)
-		{
-			p->key[j] = p->key[j + 1];
-			p->child[j + 1] = p->child[j + 2];
-		}
-		p->n--;
-
-		if (p->n == 0)
-		{
-			root = x;
-			//delete p;
-		}
-	}
-
-	//Delete the minimum element in the subtree rooted at a given node
-	T deleteMin(BNode<T> *r)
-	{
-		if (r->isLeaf)
-		{
-			T result = r->key[0];
-			for (int i = 0; i < r->n - 1; i++)
-				r->key[i] = r->key[i + 1];
-			r->n--;
-			return result;
-		}
-		else if (r->child[0]->n == t - 1)
-		{
-			if (r->child[1]->n == t - 1)
-				merge(r, 0);
-			else
-				rotate(r, 0);
-
-			return deleteMin(r->child[0]);
-		}
-		else
-			return deleteMin(r->child[0]);
-	}
-
-	//Delete the maximum element in the subtree rooted at the given node
-	T deleteMax(BNode<T> *r)
-	{
-		if (r->isLeaf)
-		{
-			r->n--;
-			return r->key[r->n];
-		}
-		else if (r->child[r->n]->n == t - 1)
-		{
-			if (r->child[r->n - 1]->n == t - 1)
-				merge(r, r->n - 1);
-			else
-				rotate(r, r->n - 1);
-
-			return deleteMax(r->child[r->n]);
-		}
-		else
-			return deleteMax(r->child[r->n]);
-	}
-
-	//Delete a given key 'k' in the subtree rooted at the given node
-	//Returns true if deleted, false if not found
-	bool deleteKey(BNode<T> *x, T k)
-	{
-		int start = 0, end = x->n - 1;
-		while (start != end)
-		{
-			int mid = (start + end) / 2;
-			if (x->key[mid] == k)
-			{
-				start = mid;
-				break;
-			}
-			else if (x->key[mid] < k)
-				start = mid + 1;
-			else
-				end = mid;
-		}
-
-		if (x->key[start] == k)
-		{
-			if (x->isLeaf)
-			{
-				for (int i = start; i < x->n - 1; i++)
-					x->key[i] = x->key[i + 1];
-				x->n--;
-			}
-			else
-			{
-				if (x->child[start]->n > t - 1)
-				{
-					T pred = deleteMax(x->child[start]);
-					x->key[start] = pred;
-				}
-				else if (x->child[start + 1]->n > t - 1)
-				{
-					T succ = deleteMin(x->child[start + 1]);
-					x->key[start] = succ;
-				}
-				else
-				{
-					merge(x, start);
-					return deleteKey(x->child[start], k);
-				}
-			}
-			return true;
-		}
-
-		if (x->isLeaf)
-			return false;
-
-		if (x->key[start] < k)
-		{
-			BNode<T> *y = x->child[start + 1];
-			if (y->n == t - 1)
-			{
-				if (x->child[start]->n > t - 1)
-					rotate(x, start);
-				else if (start + 1 < x->n && x->child[start + 2]->n > t - 1)
-					rotate(x, start + 1);
-				else
-				{
-					merge(x, start);
-					y = x->child[start];
-				}
-			}
-			return deleteKey(y, k);
-		}
-		else
-		{
-			BNode<T> *y = x->child[start];
-			if (y->n == t - 1)
-			{
-				if (x->child[start + 1]->n > t - 1)
-					rotate(x, start);
-				else if (start > 0 && x->child[start - 1]->n > t - 1)
-					rotate(x, start - 1);
-				else
-					merge(x, start);
-			}
-			return deleteKey(x->child[start], k);
-		}
-	}
-
-	//Deletes the given key from the tree if found
-	void deleteKey(T key)
-	{
-		if (deleteKey(root, key))
-			cout << key << " deleted!" << endl;
-		else
-			cout << key << " not found!" << endl;
-	}
-
 	//Print a sub-BTree rotated 90deg anti-clockwise i.e left to right on screen after a given offset
 	void print(BNode<T> *r, int offset)
 	{
@@ -603,7 +390,7 @@ int main()
 	BTree<int> tree(3);
 
 	//Input for number of insertions
-	cout << "Enter the number of initial insertions: ";
+	cout << "Enter the number of insertions: ";
 	int n;
 	cin >> n;
 
@@ -619,54 +406,15 @@ int main()
 		cout << endl;
 	}
 
-	//Menu based implementation to let the user insert, delete, search or exit
-	int choice;
-	do
+	//search in tree untill -1
+	cout << "Enter element to search (-1 to exit): ";
+	cin >> n;
+	while (n >= 0)
 	{
-		printMenu();
-		cin >> choice;
-		switch (choice)
-		{
-		case 1: //Insert
-			cout << "Enter element: ";
-			cin >> n;
-			cout << endl;
-			tree.insert(n);
-			tree.print();
-			cout << endl;
-			break;
-		case 2: //Delete
-			cout << "Enter element: ";
-			cin >> n;
-			tree.deleteKey(n);
-			cout << endl;
-			tree.print();
-			cout << endl;
-			break;
-		case 3: //Search
-			cout << "Enter element: ";
-			cin >> n;
-			tree.search(n);
-			break;
-		case 4: //Exit
-			break;
-		default:
-			cout << "Please Enter Appropriate Choice!" << endl;
-		}
-	} while (choice != 4);
-
-	cout << endl;
+		tree.search(n);
+		cout << "Enter next element to search (-1 to exit): ";
+		cin >> n;
+	}
 
 	return 0;
-}
-
-//prints the menu for user
-void printMenu()
-{
-	cout << "Menu:" << endl;
-	cout << "1. Insert" << endl;
-	cout << "2. Delete" << endl;
-	cout << "3. Search" << endl;
-	cout << "4. Exit" << endl;
-	cout << "Enter your choice: ";
 }
